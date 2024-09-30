@@ -10,7 +10,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Menunggu 3 detik sebelum pindah ke halaman login
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacementNamed(context, '/login');
     });
@@ -24,8 +23,8 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/logo.png',  // Gantilah dengan path logo yang benar
-              height: 120, // Atur ukuran logo sesuai kebutuhan
+              'assets/logo.png',  
+              height: 120, 
             ),
             SizedBox(height: 20),
             Text(

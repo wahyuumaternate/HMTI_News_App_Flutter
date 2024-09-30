@@ -10,6 +10,7 @@ void main() {
 class HMTINewsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
       title: 'HMTI News',
       theme: ThemeData(

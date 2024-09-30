@@ -14,7 +14,7 @@ class EditProfileScreen extends StatelessWidget {
             CircleAvatar(
               radius: 50,
               backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150'), // Gambar profil placeholder
+                  'https://via.placeholder.com/150'),
             ),
             SizedBox(height: 16),
             TextField(
@@ -61,7 +61,7 @@ class EditProfileScreen extends StatelessWidget {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // Kembali ke halaman sebelumnya
+                Navigator.pop(context); 
               },
               child: Text('Save Changes'),
             ),
