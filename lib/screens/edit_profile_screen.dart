@@ -4,17 +4,18 @@ class EditProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Profile'),
-      ),
-      body: Padding(
+        // appBar: AppBar(
+        //   title: Text('Edit Profile'),
+        // ),
+        body: SingleChildScrollView(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150'),
+              backgroundImage:
+                  NetworkImage('https://wahyuumaternate.my.id/foto1.png'),
             ),
             SizedBox(height: 16),
             TextField(
@@ -60,14 +61,12 @@ class EditProfileScreen extends StatelessWidget {
             ),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); 
-              },
+              onPressed: () {},
               child: Text('Save Changes'),
             ),
           ],
         ),
       ),
-    );
+    ));
   }
 }

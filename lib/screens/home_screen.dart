@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:praktikum_mobile/screens/detail_screen.dart';
 import 'edit_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -9,14 +10,93 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    Center(child: Text('Home Page')),
-    Center(child: Text('Explore Page')),
-    Center(child: Text('Bookmark Page')),
+  // Data berita statis
+  final List<Map<String, String>> news = [
+    {
+      'imageUrl':
+          'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg',
+      'title': 'Russian warship: Moskva sinks in Black Sea',
+      'author': 'Wahyu',
+      'description':
+          'Cukup salin salah satu URL di atas dan gunakan sebagai imageUrl di aplikasi Flutter atau HTML <img> tag.Kamu juga bisa mengunduh gambar dari URL tersebut dan menyimpannya untuk digunakan secara offline.',
+      'time': '4h ago',
+    },
+    {
+      'imageUrl':
+          'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg',
+      'title':
+          "Ukraine's President Zelensky to BBC: Blood money being paid for Russian oil",
+      'author': 'Wahyu',
+      'description':
+          'Cukup salin salah satu URL di atas dan gunakan sebagai imageUrl di aplikasi Flutter atau HTML <img> tag.Kamu juga bisa mengunduh gambar dari URL tersebut dan menyimpannya untuk digunakan secara offline.',
+      'time': '14m ago',
+    },
+    {
+      'imageUrl':
+          'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg',
+      'title':
+          "Ukraine's President Zelensky to BBC: Blood money being paid for Russian oil",
+      'author': 'Wahyu',
+      'description':
+          'Cukup salin salah satu URL di atas dan gunakan sebagai imageUrl di aplikasi Flutter atau HTML <img> tag.Kamu juga bisa mengunduh gambar dari URL tersebut dan menyimpannya untuk digunakan secara offline.',
+      'time': '14m ago',
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
+    // Halaman-halaman yang akan ditampilkan di IndexedStack
+    final List<Widget> pages = [
+      // Halaman Home dengan daftar berita menggunakan ListView.builder
+      ListView.builder(
+        itemCount: news.length,
+        itemBuilder: (context, index) {
+          return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DetailScreen(
+                              title: news[index]['title'].toString(),
+                              description:
+                                  news[index]['description'].toString(),
+                              imageUrl: news[index]['imageUrl'].toString(),
+                            )),
+                  );
+                },
+                child: Card(
+                  elevation: 5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.network(news[index]['imageUrl']!),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          news[index]['title']!,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          news[index]['author']! + " • " + news[index]['time']!,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+              ));
+        },
+      ),
+      Center(child: Text('Explore Page')),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -38,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.black), // Warna biru untuk ikon
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       drawer: Drawer(
         child: ListView(
@@ -51,36 +131,39 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
-              title: Text('Item 1'),
+              leading: Icon(Icons.person),
+              title: Text('Profil'),
               onTap: () {
-                // Tindakan saat Item 1 diklik
-                Navigator.pop(context); // Menutup drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditProfileScreen()),
+                );
               },
             ),
             ListTile(
-              title: Text('Item 2'),
+              leading: Icon(Icons.settings),
+              title: Text('Pengaturan'),
               onTap: () {
-                // Tindakan saat Item 2 diklik
-                Navigator.pop(context); // Menutup drawer
+                Navigator.pop(context);
               },
             ),
           ],
         ),
       ),
-      body: _currentIndex < 3 ? _pages[_currentIndex] : EditProfileScreen(),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          ...pages,
+          EditProfileScreen(), // Halaman Profil
+          EditProfileScreen(), // Halaman Profil
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
-          if (index == 3) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EditProfileScreen()),
-            );
-          } else {
-            setState(() {
-              _currentIndex = index;
-            });
-          }
+          setState(() {
+            _currentIndex = index;
+          });
         },
         selectedItemColor: Color(0xFF1877F2),
         unselectedItemColor: Colors.black,

@@ -10,8 +10,8 @@ void main() {
 class HMTINewsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'HMTI News',
       theme: ThemeData(
         primarySwatch: Colors.blue,
