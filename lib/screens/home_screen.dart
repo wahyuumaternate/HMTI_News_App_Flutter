@@ -71,7 +71,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.network(news[index]['imageUrl']!),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            8.0), // Add border radius here
+                        child: Image.network(
+                          news[index][
+                              'imageUrl']!, // Accessing imageUrl from News model
+                          fit: BoxFit
+                              .cover, // Optional: Adjust the fit as needed
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
