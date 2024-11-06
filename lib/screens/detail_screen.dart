@@ -23,7 +23,11 @@ class DetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.network(imageUrl), // Gambar berita
+              Image.network(
+                imageUrl, // Tambahkan URL dasar di sini
+                errorBuilder: (context, error, stackTrace) =>
+                    Icon(Icons.broken_image, size: 100),
+              ),
               SizedBox(height: 16),
               Text(
                 title,

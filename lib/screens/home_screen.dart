@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:praktikum_mobile/screens/detail_screen.dart';
 import 'edit_profile_screen.dart';
 
@@ -10,97 +12,105 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  // Data berita statis
-  final List<Map<String, String>> news = [
-    {
-      'imageUrl':
-          'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg',
-      'title': 'Russian warship: Moskva sinks in Black Sea',
-      'author': 'Wahyu',
-      'description':
-          'Cukup salin salah satu URL di atas dan gunakan sebagai imageUrl di aplikasi Flutter atau HTML <img> tag.Kamu juga bisa mengunduh gambar dari URL tersebut dan menyimpannya untuk digunakan secara offline.',
-      'time': '4h ago',
-    },
-    {
-      'imageUrl':
-          'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg',
-      'title':
-          "Ukraine's President Zelensky to BBC: Blood money being paid for Russian oil",
-      'author': 'Wahyu',
-      'description':
-          'Cukup salin salah satu URL di atas dan gunakan sebagai imageUrl di aplikasi Flutter atau HTML <img> tag.Kamu juga bisa mengunduh gambar dari URL tersebut dan menyimpannya untuk digunakan secara offline.',
-      'time': '14m ago',
-    },
-    {
-      'imageUrl':
-          'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg',
-      'title':
-          "Ukraine's President Zelensky to BBC: Blood money being paid for Russian oil",
-      'author': 'Wahyu',
-      'description':
-          'Cukup salin salah satu URL di atas dan gunakan sebagai imageUrl di aplikasi Flutter atau HTML <img> tag.Kamu juga bisa mengunduh gambar dari URL tersebut dan menyimpannya untuk digunakan secara offline.',
-      'time': '14m ago',
-    },
-  ];
+  // Fungsi untuk mengambil data dari API
+  Future<List<Map<String, String>>> fetchNews() async {
+    final response = await http
+        .get(Uri.parse('https://events.hmti.unkhair.ac.id/api/posts'));
+
+    if (response.statusCode == 200) {
+      try {
+        List<dynamic> data = json.decode(response.body);
+
+        // Memetakan data dari API ke format yang diinginkan
+        return data.map<Map<String, String>>((item) {
+          return {
+            'imageUrl': 'https://events.hmti.unkhair.ac.id/storage/' +
+                (item['image'] ?? ''),
+            'title': item['title']?.toString() ?? 'No Title',
+            'author': item['author']?.toString() ?? 'Unknown',
+            'description': item['content']?.toString() ?? 'No Description',
+            'time': item['updated_at']?.toString() ?? 'Unknown',
+          };
+        }).toList();
+      } catch (e) {
+        print("Error parsing data: $e");
+        throw Exception('Failed to parse news data');
+      }
+    } else {
+      print("Failed to load news with status: ${response.statusCode}");
+      throw Exception('Failed to load news');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Halaman-halaman yang akan ditampilkan di IndexedStack
     final List<Widget> pages = [
-      // Halaman Home dengan daftar berita menggunakan ListView.builder
-      ListView.builder(
-        itemCount: news.length,
-        itemBuilder: (context, index) {
-          return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DetailScreen(
-                              title: news[index]['title'].toString(),
-                              description:
-                                  news[index]['description'].toString(),
-                              imageUrl: news[index]['imageUrl'].toString(),
-                            )),
-                  );
-                },
-                child: Card(
-                  elevation: 5,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            8.0), // Add border radius here
-                        child: Image.network(
-                          news[index][
-                              'imageUrl']!, // Accessing imageUrl from News model
-                          fit: BoxFit
-                              .cover, // Optional: Adjust the fit as needed
+      FutureBuilder<List<Map<String, String>>>(
+        future: fetchNews(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No news available'));
+          } else {
+            List<Map<String, String>> news = snapshot.data!;
+            return ListView.builder(
+              itemCount: news.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailScreen(
+                            title: news[index]['title'].toString(),
+                            description: news[index]['description'].toString(),
+                            imageUrl: news[index]['imageUrl'].toString(),
+                          ),
                         ),
+                      );
+                    },
+                    child: Card(
+                      elevation: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.network(
+                              news[index]['imageUrl']!,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              news[index]['title']!,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              '${news[index]['author']} • ${news[index]['time']}',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          news[index]['title']!,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          news[index]['author']! + " • " + news[index]['time']!,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                    ],
+                    ),
                   ),
-                ),
-              ));
+                );
+              },
+            );
+          }
         },
       ),
       Center(child: Text('Explore Page')),
@@ -163,8 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _currentIndex,
         children: [
           ...pages,
-          EditProfileScreen(), // Halaman Profil
-          EditProfileScreen(), // Halaman Profil
+          EditProfileScreen(),
+          EditProfileScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
